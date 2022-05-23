@@ -2,7 +2,7 @@
 
 lalrpop_mod!(pub calc, "/calc/calc.rs");
 
-pub mod ast;
+mod calc_ast;
 
 fn main() {
     println!("{}", calc::ExprParser::new().parse("0x32 -> b").unwrap());
