@@ -1,23 +1,31 @@
 use crate::calc_ast::{Operator, Type};
 grammar;
 
-pub Expr: u64 = {
-    <n:num> "->" <t:convTo> => {
-        match t {
+pub ExprLine: (u64, Type) = {
+    <e:Expr> "->" <t:convTo> => {
+        let ret = match t {
             Type::Decimal => {
-                println!("{}", n);
-                n
+                e
             },
             Type::Hex => {
-                println!("{:#x}", n);
-                n
+                e
             },
             Type::Binary => {
-                println!("{:#b}", n);
-                n
+                e
             }
+        };
+        (e, t)
+    },
+}
+
+pub Expr: u64 = {
+    <e1:Expr> <o:op> <e2:num> => {
+        match o {
+            Operator::Add => e1 + e2,
+            Operator::Subtract => e1 - e2,
         }
     },
+    <n:num> => n,
 }
 
 num: u64 = {

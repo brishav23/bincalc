@@ -3,14 +3,25 @@
 lalrpop_mod!(pub calc, "/calc/calc.rs");
 
 mod calc_ast;
+use calc_ast::Type;
 
 fn main() {
-    println!("{}", calc::ExprParser::new().parse("0x32 -> b").unwrap());
+    loop {
+        // let (n, t) = calc::ExprParser::new().parse("0x32 > b").expect("syntax error");
+        if let Ok((n, t)) = calc::ExprLineParser::new().parse("0x32 -> b") {
+            match t {
+                Type::Decimal => {
+                    println!("{} -> {}", n, n);
+                },
+                Type::Binary => {
+                    println!("{} -> {:#b}", n, n);
+                },
+                Type::Hex => {
+                    println!("{} -> {:#x}", n, n);
+                },
+            }
+        } else {
+            println!("syntax error");
+        }
+    }
 }
-
-// #[test]
-// fn correct_casting() {
-//     assert_eq!(calc::TermParser::new().parse("-23").unwrap(), 18446744073709551593u64);
-//     assert_eq!(calc::TermParser::new().parse("23").unwrap(), 23u64);
-//     assert_eq!(calc::TermParser::new().parse("0x52").unwrap(), 82u64);
-// }
