@@ -1,0 +1,22 @@
+grammar;
+
+pub Term: u64 = {
+    <d:d64> => d,
+    <x:x64> => x,
+}
+
+d64: u64 = {
+    <s:r"-[0-9]+"> => {
+        let ret = i64::from_str_radix(s, 10).unwrap();
+        ret as u64
+    },
+    <s:r"[0-9]+"> => {
+        u64::from_str_radix(s, 10).unwrap()
+    },
+}
+
+x64: u64 = {
+    <s:r"0x[0-9a-fA-F]+"> => {
+        u64::from_str_radix(&s[2..], 16).unwrap()
+    },
+}
