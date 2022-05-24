@@ -2,7 +2,7 @@ use crate::calc_ast::{Operator, Type};
 grammar;
 
 pub ExprLine: (u64, Type) = {
-    <e:Expr> "->" <t:convTo> => {
+    <e:expr> "->" <t:convTo> => {
         let ret = match t {
             Type::Decimal => {
                 e
@@ -18,17 +18,17 @@ pub ExprLine: (u64, Type) = {
     },
 }
 
-pub Expr: u64 = {
-    <e1:Expr> <o:op> <e2:num> => {
+expr: u64 = {
+    <e1:expr> <o:op> <e2:term> => {
         match o {
             Operator::Add => e1 + e2,
             Operator::Subtract => e1 - e2,
         }
     },
-    <n:num> => n,
+    <n:term> => n,
 }
 
-num: u64 = {
+term: u64 = {
     <d:d64> => d,
     <x:x64> => x,
     <b:b64> => b,
