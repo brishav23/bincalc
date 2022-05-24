@@ -1,40 +1,26 @@
-use crate::calc_ast::{Operator, Type};
+use crate::calc_ast::{Operator, Type, Term, Tree};
 grammar;
 
-pub ExprLine: (u64, Type) = {
-    <e:expr> "->" <t:convTo> => {
-        let ret = match t {
-            Type::Decimal => {
-                e
-            },
-            Type::Hex => {
-                e
-            },
-            Type::Binary => {
-                e
-            }
-        };
-        (e, t)
+pub ExprLine: Tree = {
+    <t:term> "->" <to:format> => {
+        Tree{format: to, exp: t}
     },
 }
 
-expr: u64 = {
-    <e1:expr> <o:op> <e2:term> => {
-        match o {
-            Operator::Add => e1 + e2,
-            Operator::Subtract => e1 - e2,
-        }
+term: Box<Term> = {
+    "(" <e1:term> <o:op> <e2:term> ")" => {
+        Box::new(Term::Line(e1, o, e2))
     },
-    <n:term> => n,
+    <n:num> => Box::new(Term::Val(n)),
 }
 
-term: u64 = {
+num: u64 = {
     <d:d64> => d,
     <x:x64> => x,
     <b:b64> => b,
 }
 
-convTo: Type = {
+format: Type = {
     "d" => Type::Decimal,
     "x" => Type::Hex,
     "b" => Type::Binary,
