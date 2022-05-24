@@ -1,9 +1,9 @@
 use crate::calc_ast::{Operator, Type, Term, Tree};
 grammar;
 
-pub ExprLine: Tree = {
+pub ExprLine: Box<Tree> = {
     <t:term> "->" <to:format> => {
-        Tree{format: to, exp: t}
+        Box::new(Tree{format: to, exp: t})
     },
 }
 
