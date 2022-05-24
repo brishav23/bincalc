@@ -8,16 +8,16 @@ use calc_ast::Type;
 fn main() {
     loop {
         // let (n, t) = calc::ExprParser::new().parse("0x32 > b").expect("syntax error");
-        if let Ok((n, t)) = calc::ExprLineParser::new().parse("0x32 -> b") {
+        if let Ok((n, t)) = calc::ExprLineParser::new().parse("0b1101 -> d") {
             match t {
                 Type::Decimal => {
-                    println!("{} -> {}", n, n);
+                    println!("{}", n);
                 },
                 Type::Binary => {
-                    println!("{} -> {:#b}", n, n);
+                    println!("{:#b}", n);
                 },
                 Type::Hex => {
-                    println!("{} -> {:#x}", n, n);
+                    println!("{:#x}", n);
                 },
             }
         } else {

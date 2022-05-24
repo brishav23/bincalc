@@ -31,6 +31,7 @@ pub Expr: u64 = {
 num: u64 = {
     <d:d64> => d,
     <x:x64> => x,
+    <b:b64> => b,
 }
 
 convTo: Type = {
@@ -46,16 +47,22 @@ op: Operator = {
 
 d64: u64 = {
     <s:r"-[0-9]+"> => {
-        let ret = i64::from_str_radix(s, 10).unwrap();
+        let ret = i64::from_str_radix(s, 10).expect("Invalid decimal integer");
         ret as u64
     },
     <s:r"[0-9]+"> => {
-        u64::from_str_radix(s, 10).unwrap()
+        u64::from_str_radix(s, 10).expect("Invalid decimal integer")
     },
 }
 
 x64: u64 = {
     <s:r"0x[0-9a-fA-F]+"> => {
-        u64::from_str_radix(&s[2..], 16).unwrap()
+        u64::from_str_radix(&s[2..], 16).expect("Invalid hex")
     },
+}
+
+b64: u64 = {
+    <s:r"0b[0-1]+"> => {
+        u64::from_str_radix(&s[2..], 2).expect("Invalid binary")
+    }
 }
