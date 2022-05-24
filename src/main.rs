@@ -14,7 +14,7 @@ fn main() {
         input.clear();
         io::stdin().read_line(&mut input).expect("Can't read stdin");
         if let Ok(tree) = parser.parse(&input[..]) {
-            let res: u64 = calculate(&*tree.exp);
+            let res: u64 = calculate(tree.exp);
             match tree.format {
                 Type::Decimal => println!("{}", res),
                 Type::Hex => println!("{:#x}", res),
@@ -26,19 +26,19 @@ fn main() {
     }
 }
 
-fn calculate(t: &Term) -> u64 {
-    match t {
+fn calculate(t: Box<Term>) -> u64 {
+    match *t {
         Term::Line(t1, op, t2) => {
             let res = match op {
                 Operator::Add => {
-                    calculate(&*t1) + calculate(&*t2)
+                    calculate(t1) + calculate(t2)
                 },
                 Operator::Subtract => {
-                    calculate(&*t1) - calculate(&*t2)
+                    calculate(t1) - calculate(t2)
                 },
             };
             res
         },
-        Term::Val(n) => *n,
+        Term::Val(n) => n,
     }
 }
