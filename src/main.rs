@@ -1,17 +1,25 @@
+use std::io;
+
 #[macro_use] extern crate lalrpop_util;
 
 lalrpop_mod!(pub calc, "/calc/calc.rs");
 
 mod calc_ast;
-use calc_ast::{Term, Operator};
+use calc_ast::{Type, Term, Operator};
 
 fn main() {
     let parser = calc::ExprLineParser::new();
+    let mut input: String = String::with_capacity(1024);
     loop {
-        if let Ok(tree) = parser.parse("((0b111 + 0x23) + 23) -> d") {
-            // println!("{:?}", tree);
+        input.clear();
+        io::stdin().read_line(&mut input).expect("Can't read stdin");
+        if let Ok(tree) = parser.parse(&input[..]) {
             let res: u64 = calculate(&*tree.exp);
-            println!("{}", res);
+            match tree.format {
+                Type::Decimal => println!("{}", res),
+                Type::Hex => println!("{:#x}", res),
+                Type::Binary => println!("{:#b}", res),
+            }
         } else {
             println!("syntax error");
         }
