@@ -43,6 +43,7 @@ version = "0.1.0"
 dependencies = [
  "lalrpop",
  "lalrpop-util",
+ "libc",
  "regex",
 ]
 

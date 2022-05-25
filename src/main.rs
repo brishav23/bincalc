@@ -1,27 +1,34 @@
-use std::io;
-
 #[macro_use] extern crate lalrpop_util;
 
 lalrpop_mod!(pub calc, "/calc/calc.rs");
-
 mod calc_ast;
+mod terminal;
+mod readline;
+
 use calc_ast::{Type, Term, Operator};
+use terminal::{Termios};
+use readline::{readline};
 
 fn main() {
+    // Backup tty to restore later
+    let mut old_term: Termios = Termios::new().unwrap();
+    old_term.backup_tty();
+
+    // Set tty into raw mode
+    Termios::set_raw();
+
     let parser = calc::ExprLineParser::new();
-    let mut input: String = String::with_capacity(1024);
     loop {
-        input.clear();
-        io::stdin().read_line(&mut input).expect("Can't read stdin");
+        let input = readline();
         if let Ok(tree) = parser.parse(&input[..]) {
             let res: u64 = calculate(&tree.exp);
             match tree.format {
-                Type::Decimal => println!("{}", res),
-                Type::Hex => println!("{:#x}", res),
-                Type::Binary => println!("{:#b}", res),
+                Type::Decimal => print!("{}\r\n", res),
+                Type::Hex => print!("{:#x}\r\n", res),
+                Type::Binary => print!("{:#b}\r\n", res),
             }
         } else {
-            println!("syntax error");
+            print!("syntax error\r\n");
         }
     }
 }
