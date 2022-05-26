@@ -18,17 +18,29 @@ pub fn readline() -> String {
             0x1bu8 => { // escape sequence
                 let mut more_chars = [0u8; 2];
                 let (first_char, second_char) = more_chars.split_at_mut(1);
-                // let first_char = &mut more_chars[0..1];
-                // let second_char = &mut more_chars[1..2];
                 stdin.read(first_char).unwrap();
                 stdin.read(second_char).unwrap();
     
                 match (first_char[0], second_char[0]) {
                     (0x5bu8, 0x43u8) => { // right arrow
-                        //
+                        let c = ins_buf.pop();
+                        match c {
+                            Some(c) => {
+                                line_buf.push(c);
+                            },
+                            None => {},
+                        }
+                        put_line(&line_buf, &ins_buf);
                     },
                     (0x5bu8, 0x44u8) => { // left arrow
-                        //
+                        let c = line_buf.pop();
+                        match c {
+                            Some(c) => {
+                                ins_buf.push(c);
+                            },
+                            None => {},
+                        }
+                        put_line(&line_buf, &ins_buf);
                     },
                     (0x5bu8, 0x42u8) => { // down arrow
                         //
@@ -47,8 +59,7 @@ pub fn readline() -> String {
             },
             _ => {
                 line_buf.push(char[0] as char);
-                io::stdout().write(char).unwrap();
-                io::stdout().flush().unwrap();
+                put_line(&line_buf, &ins_buf);
             }
         }
     }
@@ -64,4 +75,23 @@ fn combine_bufs(line: &mut String, ins: &mut String) {
             None => {break;},
         }
     }
+}
+
+fn put_line(line: &String, ins: &String) {
+    io::stdout().write(b"\x1b[2K\r").unwrap();
+    io::stdout().write(line[..].as_bytes()).unwrap();
+    let l = ins.len();
+    if l > 0 {
+        ins[..].as_bytes()
+               .iter()
+               .rev()
+               .map(|x| x)
+               .for_each(|x| {
+                   io::stdout().write(&[*x]).unwrap();
+                });
+        for _ in 1..l+1 {
+            io::stdout().write(b"\x1b[1D").unwrap();
+        }
+    }
+    io::stdout().flush().unwrap();
 }

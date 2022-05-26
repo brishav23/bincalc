@@ -17,6 +17,7 @@ fn main() {
     // Set tty into raw mode
     Termios::set_raw();
 
+    // Start parsing
     let parser = calc::ExprLineParser::new();
     loop {
         let input = readline();
