@@ -4,15 +4,28 @@ lalrpop_mod!(pub calc, "/calc/calc.rs");
 mod calc_ast;
 mod terminal;
 mod readline;
+mod sigaction;
 
+use std::ptr;
 use calc_ast::{Type, Term, Operator};
+use libc::{SIGINT, siginfo_t, termios};
+use sigaction::Sigaction;
 use terminal::{Termios};
 use readline::{readline};
 
+// backed up terminal state, static because need to access from sigint handler
+static mut BACKUP: *const termios = ptr::null();
+
 fn main() {
+    // Sets up interrupt handler for SIGINT
+    let _interrupt_handler: Sigaction = Sigaction::new(SIGINT, sigint_handler).unwrap();
+
     // Backup tty to restore later
     let mut old_term: Termios = Termios::new().unwrap();
     old_term.backup_tty();
+    unsafe {
+        BACKUP = old_term.cstruct as *const termios;
+    }
 
     // Set tty into raw mode
     Termios::set_raw();
@@ -49,4 +62,11 @@ fn calculate(t: &Term) -> u64 {
         },
         Term::Val(n) => *n,
     }
+}
+
+fn sigint_handler(_i: i32, _info: siginfo_t, _vp: usize) {
+    unsafe { // accessing mutable static variable
+        Termios::restore_tty(BACKUP);
+    }
+    std::process::exit(0);
 }
