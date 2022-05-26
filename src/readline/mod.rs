@@ -5,8 +5,6 @@ pub fn readline() -> String {
     // information about current line
     let mut line_buf = String::with_capacity(1024);
     let mut ins_buf = String::with_capacity(1024);
-    // let mut cursor: usize = 0;
-    // let mut line_length: usize = 0;
 
     let mut stdin: io::Stdin = io::stdin();
     let mut input_char = [0u8; 1];
