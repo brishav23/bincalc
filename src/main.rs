@@ -90,7 +90,7 @@ fn calculate(t: &Term) -> Result<u64, MathError> {
                     let l: u64 = calculate(t1)?;
                     let r: u64 = calculate(t2)?;
                     if r < 64 {
-                        Ok(l << r)
+                        Ok(l >> r)
                     } else {
                         Err(MathError::BadShift)
                     }
@@ -98,6 +98,10 @@ fn calculate(t: &Term) -> Result<u64, MathError> {
             };
             res
         },
+        Term::Negate(t) => {
+            let l: u64 = calculate(t)?;
+            Ok(!l)
+        }
         Term::Val(n) => Ok(*n),
     }
 }

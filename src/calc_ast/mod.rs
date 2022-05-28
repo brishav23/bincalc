@@ -8,6 +8,7 @@ pub struct Tree {
 pub enum Term {
     Val(u64),
     Line(Box<Term>, Operator, Box<Term>),
+    Negate(Box<Term>),
 }
 
 #[derive(Debug)]

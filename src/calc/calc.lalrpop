@@ -11,6 +11,9 @@ term: Box<Term> = {
     "(" <e1:term> <o:op> <e2:term> ")" => {
         Box::new(Term::Line(e1, o, e2))
     },
+    "~" <e:term> => {
+        Box::new(Term::Negate(e))
+    },
     <n:num> => Box::new(Term::Val(n)),
 }
 
