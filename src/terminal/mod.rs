@@ -6,14 +6,14 @@ pub struct Termios {
 }
 
 impl Termios {
-    pub fn new() -> Option<Termios> {
+    pub fn new() -> Option<Self> {
         unsafe {
             let layout = Layout::new::<termios>();
             let ptr: *mut u8 = alloc(layout);
             if ptr.is_null() {
                 None
             } else {
-                Some(Termios {
+                Some(Self {
                     cstruct: ptr as *mut termios,
                 })
             }
@@ -38,7 +38,7 @@ impl Termios {
     }
 
     pub fn set_raw() {
-        let term: Termios = Termios::new().unwrap();
+        let term: Self = Self::new().unwrap();
         unsafe {
             // cfmakeraw(&mut *term.cstruct as *mut termios);
             cfmakeraw(term.cstruct);

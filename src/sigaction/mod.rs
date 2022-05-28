@@ -8,14 +8,14 @@ pub struct Sigaction {
 
 impl Sigaction {
     // takes a signal and handler as argument and calls sigaction to set handler
-    pub fn new(sig: i32, f: fn(i32, siginfo_t, usize)) -> Option<Sigaction> {
+    pub fn new(sig: i32, f: fn(i32, siginfo_t, usize)) -> Option<Self> {
         let layout = Layout::new::<sigaction>();
         unsafe {
             let rawptr: *mut u8 = alloc(layout);
             if rawptr.is_null() {
                 None
             } else {
-                let sa = Sigaction {
+                let sa = Self {
                     cstruct: rawptr as *mut sigaction,
                 };
                 (*sa.cstruct).sa_flags = SA_SIGINFO | SA_RESTART;
