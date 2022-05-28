@@ -7,7 +7,7 @@ mod readline;
 mod sigaction;
 
 use std::ptr;
-use calc_ast::{Type, Term, Operator};
+use calc_ast::{Type, Term, Operator, MathError};
 use libc::{SIGINT, siginfo_t, termios};
 use sigaction::Sigaction;
 use terminal::{Termios};
@@ -45,7 +45,17 @@ fn main() {
                     }
                 },
                 Err(e) => {
-                    print!("Math error!\r\n");
+                    match e {
+                        MathError::BadAddition => {
+                            print!("You added numbers that caused an overflow for unsigned 64-bit integers\r\n");
+                        },
+                        MathError::BadSubtraction => {
+                            print!("This calculator only works with unsigned numbers, your subtraction caused a negative number\r\n");
+                        },
+                        MathError::BadShift => {
+                            print!("You shifted more than 64 bits\r\n");
+                        },
+                    }
                 }
             }
         } else {
@@ -111,10 +121,4 @@ fn sigint_handler(_i: i32, _info: siginfo_t, _vp: usize) {
         Termios::restore_tty(BACKUP);
     }
     std::process::exit(0);
-}
-
-enum MathError {
-    BadSubtraction,
-    BadAddition,
-    BadShift,
 }

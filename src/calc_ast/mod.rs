@@ -25,3 +25,9 @@ pub enum Type {
     Hex,
     Binary,
 }
+
+pub enum MathError {
+    BadSubtraction,
+    BadAddition,
+    BadShift,
+}
