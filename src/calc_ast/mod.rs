@@ -1,19 +1,21 @@
 #[derive(Debug)]
 pub struct Tree {
     pub format: Type,
-    pub exp: Box<Term>
+    pub exp: Box<Term>,
 }
 
 #[derive(Debug)]
 pub enum Term {
     Val(u64),
-    Line(Box<Term>, Operator, Box<Term>)
+    Line(Box<Term>, Operator, Box<Term>),
 }
 
 #[derive(Debug)]
 pub enum Operator {
     Add,
     Subtract,
+    LShift,
+    RShift,
 }
 
 #[derive(Debug)]

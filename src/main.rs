@@ -35,11 +35,18 @@ fn main() {
     loop {
         let input = readline();
         if let Ok(tree) = parser.parse(&input[..]) {
-            let res: u64 = calculate(&tree.exp);
-            match tree.format {
-                Type::Decimal => print!("{}\r\n", res),
-                Type::Hex => print!("{:#x}\r\n", res),
-                Type::Binary => print!("{:#b}\r\n", res),
+            let res = calculate(&tree.exp);
+            match res {
+                Ok(r) => {
+                    match tree.format {
+                        Type::Decimal => print!("{}\r\n", r),
+                        Type::Hex => print!("{:#x}\r\n", r),
+                        Type::Binary => print!("{:#b}\r\n", r),
+                    }
+                },
+                Err(e) => {
+                    print!("Math error!\r\n");
+                }
             }
         } else {
             print!("syntax error\r\n");
@@ -47,20 +54,51 @@ fn main() {
     }
 }
 
-fn calculate(t: &Term) -> u64 {
+fn calculate(t: &Term) -> Result<u64, MathError> {
     match t {
         Term::Line(t1, op, t2) => {
             let res = match op {
                 Operator::Add => {
-                    calculate(t1) + calculate(t2)
+                    let l: u64 = calculate(t1)?;
+                    let r: u64 = calculate(t2)?;
+                    let res: u128 = l as u128 + r as u128;
+                    if res > 0xffffffffffffffff {
+                        Err(MathError::BadAddition)
+                    } else {
+                        Ok(l + r)
+                    }
                 },
                 Operator::Subtract => {
-                    calculate(t1) - calculate(t2)
+                    let l: u64 = calculate(t1)?;
+                    let r: u64 = calculate(t2)?;
+                    if l < r {
+                        Err(MathError::BadSubtraction)
+                    } else {
+                        Ok(l - r)
+                    }
+                },
+                Operator::LShift => {
+                    let l: u64 = calculate(t1)?;
+                    let r: u64 = calculate(t2)?;
+                    if r < 64 {
+                        Ok(l << r)
+                    } else {
+                        Err(MathError::BadShift)
+                    }
+                },
+                Operator::RShift => {
+                    let l: u64 = calculate(t1)?;
+                    let r: u64 = calculate(t2)?;
+                    if r < 64 {
+                        Ok(l << r)
+                    } else {
+                        Err(MathError::BadShift)
+                    }
                 },
             };
             res
         },
-        Term::Val(n) => *n,
+        Term::Val(n) => Ok(*n),
     }
 }
 
@@ -69,4 +107,10 @@ fn sigint_handler(_i: i32, _info: siginfo_t, _vp: usize) {
         Termios::restore_tty(BACKUP);
     }
     std::process::exit(0);
+}
+
+enum MathError {
+    BadSubtraction,
+    BadAddition,
+    BadShift,
 }

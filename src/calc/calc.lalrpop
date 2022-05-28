@@ -29,6 +29,8 @@ format: Type = {
 op: Operator = {
     "+" => Operator::Add,
     "-" => Operator::Subtract,
+    "<<" => Operator::LShift,
+    ">>" => Operator::RShift,
 }
 
 d64: u64 = {
