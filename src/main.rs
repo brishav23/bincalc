@@ -14,7 +14,7 @@ use terminal::{Termios};
 use readline::{readline};
 
 // backed up terminal state, static because need to access from sigint handler
-static mut BACKUP: *const termios = ptr::null();
+static mut BACKUP_TTY: *const termios = ptr::null();
 
 fn main() {
     // Sets up interrupt handler for SIGINT
@@ -24,7 +24,7 @@ fn main() {
     let mut old_term: Termios = Termios::new().unwrap();
     old_term.backup_tty();
     unsafe {
-        BACKUP = old_term.cstruct as *const termios;
+        BACKUP_TTY = old_term.cstruct as *const termios;
     }
 
     // Set tty into raw mode
@@ -118,7 +118,7 @@ fn calculate(t: &Term) -> Result<u64, MathError> {
 
 fn sigint_handler(_i: i32, _info: siginfo_t, _vp: usize) {
     unsafe { // accessing mutable static variable
-        Termios::restore_tty(BACKUP);
+        Termios::restore_tty(BACKUP_TTY);
     }
     std::process::exit(0);
 }
