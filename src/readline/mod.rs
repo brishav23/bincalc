@@ -13,7 +13,7 @@ pub fn readline() -> String {
     loop {
         stdin.read(char).unwrap();
         match char[0] {
-            0x1bu8 => { // escape sequence
+            0x1bu8 => { // escape sequence, read 2 more characters
                 let mut more_chars = [0u8; 2];
                 let (first_char, second_char) = more_chars.split_at_mut(1);
                 stdin.read(first_char).unwrap();
@@ -49,12 +49,21 @@ pub fn readline() -> String {
                     _ => {}
                 }
             },
-            0xdu8 => {
+            0xdu8 => { // end of line
                 io::stdout().write(b"\r\n").unwrap();
                 io::stdout().flush().unwrap();
                 combine_bufs(&mut line_buf, &mut ins_buf);
                 break;
             },
+            0x8u8 | 0x7fu8 => {
+                let c = line_buf.pop();
+                match c {
+                    Some(_) => {
+                        put_line(&line_buf, &ins_buf);
+                    },
+                    None => {},
+                }
+            }
             _ => {
                 line_buf.push(char[0] as char);
                 put_line(&line_buf, &ins_buf);
