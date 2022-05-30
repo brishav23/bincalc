@@ -63,7 +63,7 @@ pub fn readline() -> String {
                     },
                     None => {},
                 }
-            }
+            },
             _ => {
                 line_buf.push(char[0] as char);
                 put_line(&line_buf, &ins_buf);
