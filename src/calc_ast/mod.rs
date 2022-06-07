@@ -15,6 +15,8 @@ pub enum Term {
 pub enum Operator {
     Add,
     Subtract,
+    Mul,
+    Div,
     LShift,
     RShift,
 }
@@ -27,7 +29,5 @@ pub enum Type {
 }
 
 pub enum MathError {
-    BadSubtraction,
-    BadAddition,
     BadShift,
 }

@@ -46,12 +46,6 @@ fn main() {
                 },
                 Err(e) => {
                     match e {
-                        MathError::BadAddition => {
-                            print!("You added numbers that caused an overflow for unsigned 64-bit integers\r\n");
-                        },
-                        MathError::BadSubtraction => {
-                            print!("This calculator only works with unsigned numbers, your subtraction caused a negative number\r\n");
-                        },
                         MathError::BadShift => {
                             print!("You shifted more than 64 bits\r\n");
                         },
@@ -71,21 +65,22 @@ fn calculate(t: &Term) -> Result<u64, MathError> {
                 Operator::Add => {
                     let l: u64 = calculate(t1)?;
                     let r: u64 = calculate(t2)?;
-                    let res: u128 = l as u128 + r as u128;
-                    if res > 0xffffffffffffffff {
-                        Err(MathError::BadAddition)
-                    } else {
-                        Ok(l + r)
-                    }
+                    Ok(l.wrapping_add(r))
                 },
                 Operator::Subtract => {
                     let l: u64 = calculate(t1)?;
                     let r: u64 = calculate(t2)?;
-                    if l < r {
-                        Err(MathError::BadSubtraction)
-                    } else {
-                        Ok(l - r)
-                    }
+                    Ok(l.wrapping_sub(r))
+                },
+                Operator::Mul => {
+                    let l: u64 = calculate(t1)?;
+                    let r: u64 = calculate(t2)?;
+                    Ok(l.wrapping_mul(r))
+                },
+                Operator::Div => {
+                    let l: u64 = calculate(t1)?;
+                    let r: u64 = calculate(t2)?;
+                    Ok(l.wrapping_div(r))
                 },
                 Operator::LShift => {
                     let l: u64 = calculate(t1)?;
