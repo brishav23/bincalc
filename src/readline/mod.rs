@@ -13,12 +13,53 @@ pub fn readline() -> String {
     loop {
         stdin.read(char).unwrap();
         match char[0] {
-            0x1bu8 => { // escape sequence, read 2 more characters
+            0x1bu8 => { // escape sequence, read 1 or 2 more characters
                 let mut more_chars = [0u8; 2];
                 let (first_char, second_char) = more_chars.split_at_mut(1);
+
+                // check if first char means something
                 stdin.read(first_char).unwrap();
+                match first_char[0] {
+                    0x62 => {
+                        if let Some(c) = line_buf.pop() {
+                            ins_buf.push(c);
+                            loop {
+                                if let Some(c) = line_buf.pop() {
+                                    if c == ' ' {
+                                        line_buf.push(c);
+                                        break;
+                                    } else {
+                                        ins_buf.push(c);
+                                    }
+                                } else {
+                                    break;
+                                }
+                            }
+                            put_line(&line_buf, &ins_buf);
+                        }
+                        continue; // don't read second char after escape
+                    },
+                    0x66 => {
+                        loop {
+                            if let Some(c) = ins_buf.pop() {
+                                if c == ' ' {
+                                    line_buf.push(c);
+                                    break;
+                                } else {
+                                    line_buf.push(c);
+                                }
+                            } else {
+                                break;
+                            }
+                        }
+                        put_line(&line_buf, &ins_buf);
+                        continue; // don't read second char after escape
+                    },
+                    _ => {},
+                }
+
+                // read second char if first char wasn't meaningful
                 stdin.read(second_char).unwrap();
-    
                 match (first_char[0], second_char[0]) {
                     (0x5bu8, 0x43u8) => { // right arrow
                         let c = ins_buf.pop();
