@@ -36,6 +36,7 @@ op: Operator = {
     ">>" => Operator::RShift,
     "*" => Operator::Mul,
     "/" => Operator::Div,
+    "^" => Operator::Xor,
 }
 
 d64: u64 = {

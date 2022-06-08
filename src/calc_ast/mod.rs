@@ -19,6 +19,7 @@ pub enum Operator {
     Div,
     LShift,
     RShift,
+    Xor,
 }
 
 #[derive(Debug)]

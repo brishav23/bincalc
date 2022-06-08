@@ -100,6 +100,11 @@ fn calculate(t: &Term) -> Result<u64, MathError> {
                         Err(MathError::BadShift)
                     }
                 },
+                Operator::Xor => {
+                    let l: u64 = calculate(t1)?;
+                    let r: u64 = calculate(t2)?;
+                    Ok(l ^ r)
+                },
             };
             res
         },
