@@ -37,6 +37,8 @@ op: Operator = {
     "*" => Operator::Mul,
     "/" => Operator::Div,
     "^" => Operator::Xor,
+    "&" => Operator::And,
+    "|" => Operator::Or,
 }
 
 d64: u64 = {

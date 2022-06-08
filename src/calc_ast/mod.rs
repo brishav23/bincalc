@@ -20,6 +20,8 @@ pub enum Operator {
     LShift,
     RShift,
     Xor,
+    And,
+    Or,
 }
 
 #[derive(Debug)]

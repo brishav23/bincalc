@@ -105,6 +105,16 @@ fn calculate(t: &Term) -> Result<u64, MathError> {
                     let r: u64 = calculate(t2)?;
                     Ok(l ^ r)
                 },
+                Operator::And => {
+                    let l: u64 = calculate(t1)?;
+                    let r: u64 = calculate(t2)?;
+                    Ok(l & r)
+                },
+                Operator::Or => {
+                    let l: u64 = calculate(t1)?;
+                    let r: u64 = calculate(t2)?;
+                    Ok(l | r)
+                },
             };
             res
         },
